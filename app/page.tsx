@@ -39,20 +39,20 @@ function CardFeature({ title, content, icon }: CardFeatureProps) {
         {icon}
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground">{content}</p>
-      </CardContent>
+      <CardContent>{content}</CardContent>
     </Card>
   );
 }
 
 export default function Home() {
   return (
-    <main className="container mx-auto h-[90vh] flex items-center justify-center px-5 md:px-0">
+    <main className="container mx-auto pt-2 md:h-[90vh] flex items-center justify-center px-5 md:px-0">
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-rows-auto">
         <div className="lg:col-span-2 lg:row-span-3 flex flex-col justify-center gap-4">
-          <h1 className="text-2xl font-bold">Jangan Lupa Deadline Tugasmu!</h1>
-          <p className="text-muted-foreground">
+          <h1 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+            Jangan Lupa Deadline Tugasmu!
+          </h1>
+          <p className="leading-7 [&:not(:first-child)]:mt-6">
             Aplikasi ini bantu kamu ngatur tugas dengan mudah dan terintegrasi
             langsung ke Google Calendar. Biar semua deadline tetap on track dan
             nggak kelewat!
