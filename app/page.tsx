@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, Calendar, ListTodo, Target } from 'lucide-react';
+import Link from 'next/link';
 
 const features = [
   {
@@ -56,9 +57,11 @@ export default function Home() {
             langsung ke Google Calendar. Biar semua deadline tetap on track dan
             nggak kelewat!
           </p>
-          <Button size="lg" className="w-1/2">
-            Mulai Sekarang
-          </Button>
+          <Link href="/dashboard">
+            <Button size="lg" className="w-1/2">
+              Mulai Sekarang
+            </Button>
+          </Link>
         </div>
 
         {/* Cards */}
