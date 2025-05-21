@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-// import { useState } from 'react';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
 import { Menu } from 'lucide-react';
@@ -37,7 +36,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-4">
           {routes.map((route) => (
             <Link
               key={route.href}
@@ -50,8 +49,16 @@ export function Navbar() {
               {route.label}
             </Link>
           ))}
-          <Button>Masuk</Button>
-          <ModeToggle />
+          <div className="md:flex gap-2">
+            <Link href="/register">
+              <Button variant="outline">Daftar</Button>
+            </Link>
+
+            <Link href="/login">
+              <Button>Login</Button>
+            </Link>
+            <ModeToggle />
+          </div>
         </nav>
 
         {/* Mobile Navigation */}
@@ -79,9 +86,18 @@ export function Navbar() {
                   </Link>
                 </DropdownMenuItem>
               ))}
-              <DropdownMenuItem asChild>
-                <Button className="w-full mt-2">Masuk</Button>
-              </DropdownMenuItem>
+              <div className="flex gap-2 w-full px-3 py-2">
+                <Link href="/register" className="w-1/2">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Daftar
+                  </Button>
+                </Link>
+                <Link href="/login" className="w-1/2">
+                  <Button size="sm" className="w-full">
+                    Login
+                  </Button>
+                </Link>
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
