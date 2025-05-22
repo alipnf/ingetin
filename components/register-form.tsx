@@ -47,12 +47,6 @@ export function RegisterForm({
                   type="password"
                   placeholder="********"
                 />
-                <FormField
-                  id="confirmPassword"
-                  label="Konfirmasi Password"
-                  type="password"
-                  placeholder="********"
-                />
                 <Button type="submit" className="w-full">
                   Daftar
                 </Button>
