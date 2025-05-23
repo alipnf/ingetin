@@ -1,9 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
 import ViewModeToggle from '@/components/dashboard/view-mode-toogle';
+import AddTask from '@/components/dashboard/add-task';
 
 export default function Dashboard() {
   const [viewMode, setViewMode] = useState('list'); // 'list' atau 'kanban'
@@ -15,10 +14,7 @@ export default function Dashboard() {
 
         <div className="flex gap-2">
           <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Tambah Tugas
-          </Button>
+          <AddTask />
         </div>
       </div>
     </main>
