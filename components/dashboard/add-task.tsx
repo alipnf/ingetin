@@ -1,3 +1,4 @@
+import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/dialog';
 
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import FormField from '../form-field';
 
 export default function AddTask() {
@@ -50,7 +50,7 @@ export default function AddTask() {
             <FormField id="tanggal" label="Deadline" type="date" />
 
             <div className="flex items-center space-x-2">
-              <Checkbox id="google-calendar" />
+              <Switch id="google-calendar" />
               <Label htmlFor="google-calendar">
                 Tambahkan ke Google Calendar
               </Label>
