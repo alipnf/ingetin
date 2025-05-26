@@ -14,8 +14,9 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Edit, Trash } from 'lucide-react';
+import { Trash } from 'lucide-react';
 import { TaskCardProps } from '@/types/task-card';
+import AddTask from './add-task';
 
 export default function TaskCard({
   title,
@@ -24,11 +25,15 @@ export default function TaskCard({
   link,
   status,
   onStatusChange = () => {},
+  onEdit,
+  onDelete,
 }: TaskCardProps) {
   return (
     <Card className="w-full">
       <CardHeader className="space-y-2">
-        <CardTitle className="text-lg sm:text-xl break-words">{title}</CardTitle>
+        <CardTitle className="text-lg sm:text-xl break-words">
+          {title}
+        </CardTitle>
         <CardDescription className="text-sm break-words">
           {description || 'Tidak ada deskripsi.'}
         </CardDescription>
@@ -72,11 +77,17 @@ export default function TaskCard({
       </CardContent>
 
       <CardFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between">
-        <Button variant="outline" className="w-full sm:w-auto">
-          <Edit className="h-4 w-4 mr-2" />
-          Edit
-        </Button>
-        <Button variant="destructive" className="w-full sm:w-auto">
+        <AddTask
+          mode="edit"
+          task={{ title, description, deadline, link, status }}
+          onSave={onEdit}
+        />
+        <Button
+          variant="destructive"
+          className="w-full sm:w-auto"
+          onClick={onDelete}
+          size="sm"
+        >
           <Trash className="h-4 w-4 mr-2" />
           Hapus
         </Button>

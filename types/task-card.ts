@@ -5,6 +5,6 @@ export type TaskCardProps = {
   link?: string;
   status?: string;
   onStatusChange?: (value: string) => void;
-  onEdit?: () => void;
+  onEdit?: (task: TaskCardProps) => void;
   onDelete?: () => void;
 };

@@ -1,8 +1,12 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TaskCard from './task-card';
 import { dummyTasks } from '@/data/dummy/tasks';
+import { useState } from 'react';
+import { TaskCardProps } from '@/types/task-card';
 
 export default function ListView() {
+  const [tasks, setTasks] = useState<TaskCardProps[]>(dummyTasks);
+
   const tabs = [
     { label: 'Semua', value: 'semua' },
     { label: 'Belum dikerjakan', value: 'belum' },
@@ -10,8 +14,28 @@ export default function ListView() {
     { label: 'Selesai', value: 'selesai' },
   ];
 
-  const handleStatusChange = (value: string) => {
-    console.log('Status changed to:', value);
+  const handleStatusChange = (taskIndex: number, value: string) => {
+    setTasks((prevTasks) => {
+      const newTasks = [...prevTasks];
+      newTasks[taskIndex] = { ...newTasks[taskIndex], status: value };
+      return newTasks;
+    });
+  };
+
+  const handleEditTask = (taskIndex: number, updatedTask: TaskCardProps) => {
+    setTasks((prevTasks) => {
+      const newTasks = [...prevTasks];
+      newTasks[taskIndex] = updatedTask;
+      return newTasks;
+    });
+  };
+
+  const handleDeleteTask = (taskIndex: number) => {
+    setTasks((prevTasks) => {
+      const newTasks = [...prevTasks];
+      newTasks.splice(taskIndex, 1);
+      return newTasks;
+    });
   };
 
   return (
@@ -30,7 +54,7 @@ export default function ListView() {
       {tabs.map((tab) => (
         <TabsContent key={tab.value} value={tab.value} className="py-3">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dummyTasks
+            {tasks
               .filter(
                 (task) => tab.value === 'semua' || task.status === tab.value
               )
@@ -38,7 +62,9 @@ export default function ListView() {
                 <TaskCard
                   key={index}
                   {...task}
-                  onStatusChange={handleStatusChange}
+                  onStatusChange={(value) => handleStatusChange(index, value)}
+                  onEdit={(updatedTask) => handleEditTask(index, updatedTask)}
+                  onDelete={() => handleDeleteTask(index)}
                 />
               ))}
           </div>
