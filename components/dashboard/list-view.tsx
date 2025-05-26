@@ -31,7 +31,9 @@ export default function ListView() {
         <TabsContent key={tab.value} value={tab.value} className="py-3">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {dummyTasks
-              .filter((task) => tab.value === 'semua' || task.status === tab.value)
+              .filter(
+                (task) => tab.value === 'semua' || task.status === tab.value
+              )
               .map((task, index) => (
                 <TaskCard
                   key={index}

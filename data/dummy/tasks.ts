@@ -2,29 +2,31 @@ import { TaskCardProps } from '@/types/task-card';
 
 export const dummyTasks: TaskCardProps[] = [
   {
-    title: 'Membuat UI Dashboard',
-    description: 'Membuat tampilan dashboard dengan komponen yang reusable',
-    deadline: '2024-03-25',
-    link: 'https://github.com/your-repo/dashboard',
+    title: 'Tugas Besar Pemrograman Web',
+    description: 'Membuat website e-commerce menggunakan React dan Firebase',
+    deadline: '2024-06-10',
+    link: 'https://github.com/your-repo/tubes-web',
     status: 'proses',
   },
   {
-    title: 'Implementasi Autentikasi',
-    description: 'Mengimplementasikan sistem login dan register',
-    deadline: '2024-03-28',
+    title: 'Laporan Praktikum Jaringan Komputer',
+    description:
+      'Menyusun laporan hasil konfigurasi jaringan LAN & simulasi di Cisco Packet Tracer',
+    deadline: '2024-06-05',
     status: 'belum',
   },
   {
-    title: 'Setup Database',
-    description: 'Menyiapkan struktur database dan relasi antar tabel',
-    deadline: '2024-03-20',
+    title: 'Presentasi Proyek Akhir Kewirausahaan',
+    description: 'Menyiapkan presentasi ide bisnis digital dan pitch deck',
+    deadline: '2024-06-01',
     status: 'selesai',
   },
   {
-    title: 'Testing API Endpoints',
-    description: 'Melakukan testing untuk semua endpoint API',
-    deadline: '2024-03-30',
-    link: 'https://api-docs.example.com',
+    title: 'Tugas Makalah Sistem Operasi',
+    description:
+      'Membuat makalah tentang perbandingan algoritma penjadwalan CPU',
+    deadline: '2024-06-08',
+    link: 'https://drive.google.com/your-makalah',
     status: 'belum',
   },
-]; 
+];
