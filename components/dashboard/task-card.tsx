@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -14,8 +13,8 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Trash } from 'lucide-react';
 import { TaskCardProps } from '@/types/task-card';
+import DeleteTask from './delete-task';
 import AddTask from './add-task';
 
 export default function TaskCard({
@@ -82,15 +81,7 @@ export default function TaskCard({
           task={{ title, description, deadline, link, status }}
           onSave={onEdit}
         />
-        <Button
-          variant="destructive"
-          className="w-full sm:w-auto"
-          onClick={onDelete}
-          size="sm"
-        >
-          <Trash className="h-4 w-4 mr-2" />
-          Hapus
-        </Button>
+        <DeleteTask onDelete={onDelete} />
       </CardFooter>
     </Card>
   );
