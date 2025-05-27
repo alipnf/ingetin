@@ -20,7 +20,7 @@ export default function Dashboard() {
         </div>
       </div>
       {viewMode === 'list' && <ListView />}
-      {viewMode === 'kanban' && <KanbanView />}
+      {viewMode === 'kanban' && <KanbanView setViewMode={setViewMode} />}
     </main>
   );
 }
