@@ -14,10 +14,9 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { TaskCardProps } from '@/types/task-card';
-import DeleteTask from './delete-task';
-import AddTask from './add-task';
+import { DeleteTask, AddTask } from './index';
 
-export default function TaskCard({
+export function TaskCard({
   title,
   description,
   deadline,

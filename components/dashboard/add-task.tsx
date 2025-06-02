@@ -22,7 +22,7 @@ type AddTaskProps = {
   mode?: 'add' | 'edit';
 };
 
-export default function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
+export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<TaskCardProps>({
     title: '',

@@ -8,7 +8,7 @@ import {
 import { LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function ViewModeToggle({
+export function ViewModeToggle({
   viewMode,
   setViewMode,
 }: {

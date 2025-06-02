@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import ViewModeToggle from '@/components/dashboard/view-mode-toogle';
-import AddTask from '@/components/dashboard/add-task';
-import ListView from '@/components/dashboard/list-view';
-import KanbanView from '@/components/dashboard/kanban-view';
+import {
+  AddTask,
+  KanbanView,
+  ListView,
+  ViewModeToggle,
+} from '@/components/dashboard';
 
 export default function Dashboard() {
   const [viewMode, setViewMode] = useState('list'); // 'list' atau 'kanban'

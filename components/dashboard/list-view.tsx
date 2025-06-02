@@ -1,10 +1,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import TaskCard from './task-card';
 import { dummyTasks } from '@/data/dummy/tasks';
 import { useState } from 'react';
 import { TaskCardProps } from '@/types/task-card';
+import { TaskCard } from './task-card';
 
-export default function ListView() {
+export function ListView() {
   const [tasks, setTasks] = useState<TaskCardProps[]>(dummyTasks);
 
   const tabs = [

@@ -16,7 +16,7 @@ type DeleteTaskProps = {
   onDelete?: () => void;
 };
 
-export default function DeleteTask({ onDelete = () => {} }: DeleteTaskProps) {
+export function DeleteTask({ onDelete = () => {} }: DeleteTaskProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
