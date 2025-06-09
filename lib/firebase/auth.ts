@@ -6,20 +6,60 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from 'firebase/auth';
+import { useUserStore } from '@/store/user-store';
 
-export const registerUser = (email: string, password: string) => {
-  return createUserWithEmailAndPassword(auth, email, password);
+export const registerUser = async (email: string, password: string) => {
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+  const { user } = userCredential;
+
+  useUserStore.getState().setUser({
+    uid: user.uid,
+    name: user.displayName,
+    email: user.email,
+    photoURL: user.photoURL,
+  });
+
+  return userCredential;
 };
 
-export const loginUser = (email: string, password: string) => {
-  return signInWithEmailAndPassword(auth, email, password);
+export const loginUser = async (email: string, password: string) => {
+  const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+  const { user } = userCredential;
+
+  useUserStore.getState().setUser({
+    uid: user.uid,
+    name: user.displayName,
+    email: user.email,
+    photoURL: user.photoURL,
+  });
+
+  return userCredential;
 };
 
-export const logoutUser = () => {
-  return signOut(auth);
+export const logoutUser = async () => {
+  await signOut(auth);
+  useUserStore.getState().logout();
 };
 
-export const loginWithGoogle = () => {
+export const loginWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
-  return signInWithPopup(auth, provider);
+  const userCredential = await signInWithPopup(auth, provider);
+  const { user } = userCredential;
+
+  useUserStore.getState().setUser({
+    uid: user.uid,
+    name: user.displayName,
+    email: user.email,
+    photoURL: user.photoURL,
+  });
+
+  return userCredential;
 };
