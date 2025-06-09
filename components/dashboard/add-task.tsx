@@ -30,6 +30,7 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
     deadline: '',
     link: '',
     status: 'belum',
+    googleCalendar: false,
   });
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
     setOpen(false);
   };
 
-  const handleInputChange = (id: string, value: string) => {
+  const handleInputChange = (id: string, value: string | boolean) => {
     setFormData((prev) => ({
       ...prev,
       [id]: value,
@@ -114,7 +115,11 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
               />
 
               <div className="flex items-center space-x-2">
-                <Switch id="google-calendar" />
+                <Switch 
+                  id="google-calendar" 
+                  checked={formData.googleCalendar}
+                  onCheckedChange={(checked) => handleInputChange('googleCalendar', checked)}
+                />
                 <Label htmlFor="google-calendar">
                   Tambahkan ke Google Calendar
                 </Label>

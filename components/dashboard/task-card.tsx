@@ -22,6 +22,7 @@ export function TaskCard({
   deadline,
   link,
   status,
+  googleCalendar,
   onStatusChange = () => {},
   onEdit,
   onDelete,
@@ -57,6 +58,13 @@ export function TaskCard({
           </div>
         )}
 
+        {googleCalendar && (
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+            <span className="font-medium min-w-[80px]">Google Calendar:</span>
+            <span className="text-green-600 font-medium">✓ Ditambahkan</span>
+          </div>
+        )}
+
         {/* Status Select */}
         <div className="flex flex-col gap-1.5">
           <span className="font-medium">Status:</span>
@@ -77,7 +85,7 @@ export function TaskCard({
       <CardFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between">
         <AddTask
           mode="edit"
-          task={{ title, description, deadline, link, status }}
+          task={{ title, description, deadline, link, status, googleCalendar }}
           onSave={onEdit}
         />
         <DeleteTask onDelete={onDelete} />
