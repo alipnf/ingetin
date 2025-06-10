@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
-import { Menu, LogOut } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { ModeToggle } from './mode-toogle';
 import { useUserStore } from '@/store/user-store';
 import { logoutUser } from '@/lib/firebase/auth';
@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DialogLogout } from './ui/dialog-logout';
 
 const routes = [
   {
@@ -31,6 +32,7 @@ const routes = [
 export function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useUserStore();
+  const initalName = user?.name ? user?.name.charAt(0).toUpperCase() : 'U';
 
   const handleLogout = async () => {
     try {
@@ -67,26 +69,20 @@ export function Navbar() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  {user?.photoURL ? (
-                    <Avatar>
-                      <AvatarImage
-                        src={user?.photoURL || 'https://github.com/shadcn.png'}
-                      />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <Button variant="ghost" className="font-medium">
-                      {user.name || user.email}
-                    </Button>
-                  )}
+                  <Avatar>
+                    <AvatarImage
+                      src={user?.photoURL || 'https://github.com/shadcn.png'}
+                    />
+                    <AvatarFallback>{initalName}</AvatarFallback>
+                  </Avatar>
+                  {/* <Button variant="ghost" className="font-medium"> */}
+                  {/*   {user.name || user.email} */}
+                  {/* </Button> */}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="text-red-600"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                  <DropdownMenuItem>{user.name}</DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <DialogLogout handleLogout={handleLogout} />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -132,12 +128,8 @@ export function Navbar() {
               {user ? (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="text-red-600"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                  <DropdownMenuItem asChild>
+                    <DialogLogout handleLogout={handleLogout} />
                   </DropdownMenuItem>
                 </>
               ) : (
