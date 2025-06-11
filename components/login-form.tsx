@@ -1,3 +1,5 @@
+'use client';
+
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,11 +13,24 @@ import Link from 'next/link';
 import ButtonGoogle from './button-google';
 import SeparatorForm from './separator-form';
 import FormField from './form-field';
+import { useUserStore } from '@/store/user-store';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const { user } = useUserStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log('useEffect user', user);
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
