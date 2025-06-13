@@ -1,15 +1,21 @@
 'use client';
 
-import { loginWithGoogle } from '@/lib/firebase/auth';
 import { Button } from './ui/button';
 
-export default function ButtonGoogle({ children }: { children: string }) {
+interface ButtonGoogleProps {
+  children: string;
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
+export default function ButtonGoogle({ children, onClick, disabled }: ButtonGoogleProps) {
   return (
     <Button
       variant="outline"
       type="button"
       className="w-full"
-      onClick={loginWithGoogle}
+      onClick={onClick}
+      disabled={disabled}
     >
       <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
         <path

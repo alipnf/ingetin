@@ -13,22 +13,66 @@ import Link from 'next/link';
 import ButtonGoogle from './button-google';
 import FormField from './form-field';
 import SeparatorForm from './separator-form';
-import { useUserStore } from '@/store/user-store';
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { registerUser, loginWithGoogle } from '@/lib/firebase/auth';
+import { toast } from 'sonner';
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const { user } = useUserStore();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
 
-  useEffect(() => {
-    if (user) {
-      router.push('/');
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      await registerUser(formData.name, formData.email, formData.password);
+      toast.success('Registrasi berhasil');
+      router.push('/login');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Registrasi gagal';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
-  }, [user, router]);
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      await loginWithGoogle();
+      toast.success('Registrasi berhasil');
+      router.push('/');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Registrasi dengan Google gagal';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
@@ -38,9 +82,11 @@ export function RegisterForm({
           <CardDescription>Buat akun baru di ingetin</CardDescription>
         </CardHeader>
         <CardContent>
-          <ButtonGoogle>Daftar dengan Google</ButtonGoogle>
+          <ButtonGoogle onClick={handleGoogleLogin} disabled={isLoading}>
+            Daftar dengan Google
+          </ButtonGoogle>
           <SeparatorForm>Atau daftar dengan email</SeparatorForm>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-6">
                 <FormField
@@ -48,21 +94,30 @@ export function RegisterForm({
                   label="Nama"
                   type="text"
                   placeholder="Nama Lengkap"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
                 />
                 <FormField
                   id="email"
                   label="Email"
                   type="email"
                   placeholder="nama@email.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                 />
                 <FormField
                   id="password"
                   label="Password"
                   type="password"
                   placeholder="********"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
                 />
-                <Button type="submit" className="w-full">
-                  Daftar
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Loading...' : 'Daftar'}
                 </Button>
               </div>
             </div>
