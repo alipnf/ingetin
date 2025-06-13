@@ -75,9 +75,6 @@ export function Navbar() {
                     />
                     <AvatarFallback>{initalName}</AvatarFallback>
                   </Avatar>
-                  {/* <Button variant="ghost" className="font-medium"> */}
-                  {/*   {user.name || user.email} */}
-                  {/* </Button> */}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>{user.name}</DropdownMenuItem>
