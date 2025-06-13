@@ -69,10 +69,8 @@ export function Navbar() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar>
-                    <AvatarImage
-                      src={user?.photoURL || 'https://github.com/shadcn.png'}
-                    />
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage src={user?.photoURL || initalName} />
                     <AvatarFallback>{initalName}</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
