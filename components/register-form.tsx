@@ -13,66 +13,21 @@ import Link from 'next/link';
 import ButtonGoogle from './button-google';
 import FormField from './form-field';
 import SeparatorForm from './separator-form';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { registerUser, loginWithGoogle } from '@/lib/firebase/auth';
-import { toast } from 'sonner';
+import { Spinner } from './ui/spinner';
+import { useAuth } from '@/hooks/use-auth';
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      await registerUser(formData.name, formData.email, formData.password);
-      toast.success('Registrasi berhasil');
-      router.push('/login');
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Registrasi gagal';
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    try {
-      await loginWithGoogle();
-      toast.success('Registrasi berhasil');
-      router.push('/');
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Registrasi dengan Google gagal';
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    isLoading,
+    isGoogleLoading,
+    formData,
+    handleChange,
+    handleSubmitRegister,
+    handleGoogle,
+  } = useAuth();
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
@@ -82,18 +37,32 @@ export function RegisterForm({
           <CardDescription>Buat akun baru di ingetin</CardDescription>
         </CardHeader>
         <CardContent>
-          <ButtonGoogle onClick={handleGoogleLogin} disabled={isLoading}>
-            Daftar dengan Google
-          </ButtonGoogle>
+          {isGoogleLoading ? (
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || isGoogleLoading}
+              variant="outline"
+            >
+              <Spinner size="small" />
+            </Button>
+          ) : (
+            <ButtonGoogle
+              onClick={handleGoogle}
+              disabled={isLoading || isGoogleLoading}
+            >
+              Login dengan Google
+            </ButtonGoogle>
+          )}
           <SeparatorForm>Atau daftar dengan email</SeparatorForm>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmitRegister}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-6">
                 <FormField
                   id="name"
                   label="Nama"
                   type="text"
-                  placeholder="Nama Lengkap"
+                  placeholder="Masukan Nama Anda"
                   value={formData.name}
                   onChange={handleChange}
                   required
@@ -109,16 +78,30 @@ export function RegisterForm({
                 />
                 <FormField
                   id="password"
-                  label="Password"
+                  label="Kata sandi"
                   type="password"
                   placeholder="********"
                   value={formData.password}
                   onChange={handleChange}
                   required
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Loading...' : 'Daftar'}
-                </Button>
+                {isLoading ? (
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading || isGoogleLoading}
+                  >
+                    <Spinner size="small" className="text-white" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading || isGoogleLoading}
+                  >
+                    Login
+                  </Button>
+                )}
               </div>
             </div>
             <div className="mt-4 text-center text-sm">

@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loginUser, loginWithGoogle } from '@/lib/firebase/auth';
+import { registerUser, loginUser, loginWithGoogle } from '@/lib/firebase/auth';
 import { toast } from 'sonner';
 
 interface LoginFormData {
+  name: string;
   email: string;
   password: string;
 }
@@ -15,6 +16,7 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [formData, setFormData] = useState<LoginFormData>({
+    name: '',
     email: '',
     password: '',
   });
@@ -29,23 +31,7 @@ export function useAuth() {
     }));
   };
 
-  const handleEmailLogin = async (email: string, password: string) => {
-    setIsLoading(true);
-
-    try {
-      await loginUser(email, password);
-      toast.success('Login berhasil');
-      router.push('/');
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Login gagal';
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
+  const handleGoogle = async () => {
     setIsGoogleLoading(true);
     try {
       await loginWithGoogle();
@@ -60,9 +46,38 @@ export function useAuth() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmitLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    await handleEmailLogin(formData.email, formData.password);
+    setIsLoading(true);
+
+    try {
+      await loginUser(formData.email, formData.password);
+      toast.success('Login berhasil');
+      router.push('/');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Login gagal';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmitRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      await registerUser(formData.name, formData.email, formData.password);
+      toast.success('Registrasi berhasil');
+      router.push('/login');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Registrasi gagal';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return {
@@ -71,8 +86,8 @@ export function useAuth() {
     formData,
 
     handleChange,
-    handleSubmit,
-    handleEmailLogin,
-    handleGoogleLogin,
+    handleSubmitLogin,
+    handleSubmitRegister,
+    handleGoogle,
   };
 }

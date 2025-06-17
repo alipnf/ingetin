@@ -25,8 +25,8 @@ export function LoginForm({
     isGoogleLoading,
     formData,
     handleChange,
-    handleSubmit,
-    handleGoogleLogin,
+    handleSubmitLogin,
+    handleGoogle,
   } = useAuth();
 
   return (
@@ -48,14 +48,14 @@ export function LoginForm({
             </Button>
           ) : (
             <ButtonGoogle
-              onClick={handleGoogleLogin}
+              onClick={handleGoogle}
               disabled={isLoading || isGoogleLoading}
             >
               Login dengan Google
             </ButtonGoogle>
           )}
           <SeparatorForm>Atau login dengan email</SeparatorForm>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmitLogin}>
             <div className="flex flex-col gap-6">
               <FormField
                 id="email"
