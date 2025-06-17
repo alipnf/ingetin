@@ -13,63 +13,21 @@ import Link from 'next/link';
 import ButtonGoogle from './button-google';
 import SeparatorForm from './separator-form';
 import FormField from './form-field';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { loginUser, loginWithGoogle } from '@/lib/firebase/auth';
-import { toast } from 'sonner';
+import { Spinner } from './ui/spinner';
+import { useAuth } from '@/hooks/use-auth';
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      await loginUser(formData.email, formData.password);
-      toast.success('Login berhasil');
-      router.push('/');
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Login gagal';
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    try {
-      await loginWithGoogle();
-      toast.success('Login berhasil');
-      router.push('/');
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Login dengan Google gagal';
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    isLoading,
+    isGoogleLoading,
+    formData,
+    handleChange,
+    handleSubmit,
+    handleGoogleLogin,
+  } = useAuth();
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
@@ -79,9 +37,23 @@ export function LoginForm({
           <CardDescription>Masuk ke akun ingetin anda</CardDescription>
         </CardHeader>
         <CardContent>
-          <ButtonGoogle onClick={handleGoogleLogin} disabled={isLoading}>
-            Login dengan Google
-          </ButtonGoogle>
+          {isGoogleLoading ? (
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || isGoogleLoading}
+              variant="outline"
+            >
+              <Spinner size="small" />
+            </Button>
+          ) : (
+            <ButtonGoogle
+              onClick={handleGoogleLogin}
+              disabled={isLoading || isGoogleLoading}
+            >
+              Login dengan Google
+            </ButtonGoogle>
+          )}
           <SeparatorForm>Atau login dengan email</SeparatorForm>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
@@ -115,9 +87,23 @@ export function LoginForm({
                 </div>
               </div>
               <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Loading...' : 'Login'}
-                </Button>
+                {isLoading ? (
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading || isGoogleLoading}
+                  >
+                    <Spinner size="small" className="text-white" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading || isGoogleLoading}
+                  >
+                    Login
+                  </Button>
+                )}
               </div>
             </div>
             <div className="mt-4 text-center text-sm">
