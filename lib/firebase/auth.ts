@@ -42,7 +42,7 @@ export const registerUser = async (
   );
   const { user } = userCredential;
 
-  const userData = {
+  const userData: UserInfo = {
     uid: user.uid,
     name: username,
     email: user.email,
@@ -62,17 +62,21 @@ export const loginUser = async (email: string, password: string) => {
     password
   );
   const { user } = userCredential;
+  const dbUserRef = doc(db, 'users', user.uid);
+  const dbUserSnap = await getDoc(dbUserRef);
 
-  const userData = {
-    uid: user.uid,
-    name: user.displayName,
-    email: user.email,
-    photoURL: user.photoURL,
-  };
+  if (dbUserSnap.exists()) {
+    const userData = dbUserSnap.data();
+    const userDataStore: UserInfo = {
+      uid: user.uid,
+      name: userData.displayName || userData.name,
+      email: user.email,
+      photoURL: user.photoURL,
+    };
 
-  useUserStore.getState().setUser(userData);
-  await createUserDocIfNotExists(userData);
-
+    useUserStore.getState().setUser(userDataStore);
+    await createUserDocIfNotExists(userDataStore);
+  }
   return userCredential;
 };
 
@@ -81,7 +85,7 @@ export const loginWithGoogle = async () => {
   const userCredential = await signInWithPopup(auth, provider);
   const { user } = userCredential;
 
-  const userData = {
+  const userData: UserInfo = {
     uid: user.uid,
     name: user.displayName,
     email: user.email,
