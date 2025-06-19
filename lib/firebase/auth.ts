@@ -1,4 +1,4 @@
-import { auth, db } from './config';
+import { auth, db } from './config-client';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -8,6 +8,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useUserStore } from '@/store/user-store';
+import Cookies from 'js-cookie';
 
 type UserInfo = {
   uid: string;
@@ -52,6 +53,9 @@ export const registerUser = async (
   useUserStore.getState().setUser(userData);
   await createUserDocIfNotExists(userData);
 
+  const token = await user.getIdToken();
+  Cookies.set('token', token, { expires: 1 });
+
   return userCredential;
 };
 
@@ -62,6 +66,7 @@ export const loginUser = async (email: string, password: string) => {
     password
   );
   const { user } = userCredential;
+
   const dbUserRef = doc(db, 'users', user.uid);
   const dbUserSnap = await getDoc(dbUserRef);
 
@@ -77,6 +82,10 @@ export const loginUser = async (email: string, password: string) => {
     useUserStore.getState().setUser(userDataStore);
     await createUserDocIfNotExists(userDataStore);
   }
+
+  const token = await user.getIdToken();
+  Cookies.set('token', token, { expires: 1 });
+
   return userCredential;
 };
 
@@ -95,10 +104,14 @@ export const loginWithGoogle = async () => {
   useUserStore.getState().setUser(userData);
   await createUserDocIfNotExists(userData);
 
+  const token = await user.getIdToken();
+  Cookies.set('token', token, { expires: 1 });
+
   return userCredential;
 };
 
 export const logoutUser = async () => {
   await signOut(auth);
   useUserStore.getState().logout();
+  Cookies.remove('token'); // 🔐 Hapus token
 };
