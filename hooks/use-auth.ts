@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { registerUser, loginUser, loginWithGoogle } from '@/lib/firebase/auth';
 import { toast } from 'sonner';
 
@@ -11,13 +11,17 @@ interface LoginFormData {
 
 export function useAuth() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [formData, setFormData] = useState<LoginFormData>({
     name: '',
     email: '',
     password: '',
   });
+
+  const redirectPath = searchParams.get('redirect');
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -34,7 +38,7 @@ export function useAuth() {
     try {
       await loginWithGoogle();
       toast.success('Login berhasil');
-      router.push('/');
+      router.push(redirectPath || '/');
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Login dengan Google gagal';
@@ -51,7 +55,7 @@ export function useAuth() {
     try {
       await loginUser(formData.email, formData.password);
       toast.success('Login berhasil');
-      router.push('/');
+      router.push(redirectPath || '/');
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Login gagal';
