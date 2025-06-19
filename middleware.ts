@@ -2,10 +2,15 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const session = request.cookies.get('session');
+  const token = request.cookies.get('token')?.value;
+  const url = request.nextUrl;
 
-  // If there's no session and the user is trying to access the dashboard
-  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
+  const protectedPaths = ['/dashboard'];
+  const isProtected = protectedPaths.some((path) =>
+    url.pathname.startsWith(path)
+  );
+
+  if (isProtected && !token) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
@@ -13,5 +18,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
-}; 
+  matcher: ['/dashboard'],
+};
