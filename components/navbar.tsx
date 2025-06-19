@@ -1,13 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
 import { Menu } from 'lucide-react';
 import { ModeToggle } from './mode-toogle';
-import { useUserStore } from '@/store/user-store';
-import { logoutUser } from '@/lib/firebase/auth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DialogLogout } from './ui/dialog-logout';
+import { useNavbar } from '@/hooks/use-navbar';
 
 const routes = [
   {
@@ -30,18 +28,7 @@ const routes = [
 ];
 
 export function Navbar() {
-  const pathname = usePathname();
-  const { user, logout } = useUserStore();
-  const initalName = user?.name ? user?.name.charAt(0).toUpperCase() : 'U';
-
-  const handleLogout = async () => {
-    try {
-      await logoutUser();
-      logout();
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
+  const { pathName, user, initalName, handleLogout } = useNavbar();
 
   return (
     <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -59,7 +46,7 @@ export function Navbar() {
               href={route.href}
               className={cn(
                 'text-sm font-medium transition-colors hover:text-primary',
-                pathname === route.href ? 'text-primary' : null
+                pathName === route.href ? 'text-primary' : null
               )}
             >
               {route.label}
@@ -111,7 +98,7 @@ export function Navbar() {
                     href={route.href}
                     className={cn(
                       'w-full text-sm',
-                      pathname === route.href
+                      pathName === route.href
                         ? 'text-primary'
                         : 'text-muted-foreground'
                     )}
