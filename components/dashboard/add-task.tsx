@@ -15,6 +15,7 @@ import {
 
 import { Label } from '@/components/ui/label';
 import FormField from '../form-field';
+import { getLoginProvider } from '@/lib/firebase/auth';
 
 type AddTaskProps = {
   task?: TaskCardProps;
@@ -32,6 +33,20 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
     status: 'belum',
     googleCalendar: false,
   });
+  const [loginProvider, setLoginProvider] = useState<
+    'google' | 'email' | 'unknown'
+  >('unknown');
+
+  const isGoogleLogin = loginProvider === 'google';
+
+  useEffect(() => {
+    const checkProvider = async () => {
+      const provider = await getLoginProvider();
+      setLoginProvider(provider);
+    };
+
+    checkProvider();
+  }, []);
 
   useEffect(() => {
     if (task && mode === 'edit') {
@@ -115,15 +130,24 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
               />
 
               <div className="flex items-center space-x-2">
-                <Switch 
-                  id="google-calendar" 
+                <Switch
+                  id="google-calendar"
                   checked={formData.googleCalendar}
-                  onCheckedChange={(checked) => handleInputChange('googleCalendar', checked)}
+                  disabled={!isGoogleLogin}
+                  onCheckedChange={(checked) =>
+                    handleInputChange('googleCalendar', checked)
+                  }
                 />
                 <Label htmlFor="google-calendar">
                   Tambahkan ke Google Calendar
                 </Label>
               </div>
+
+              {!isGoogleLogin && (
+                <p className="text-xs text-red-500">
+                  Login dengan Google untuk menggunakan fitur ini
+                </p>
+              )}
 
               <p className="text-sm text-muted-foreground">
                 Tugas akan otomatis ditambahkan ke Google Calendar Anda
