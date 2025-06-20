@@ -8,7 +8,6 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useUserStore } from '@/store/user-store';
-import Cookies from 'js-cookie';
 
 type UserInfo = {
   uid: string;
@@ -29,6 +28,14 @@ const createUserDocIfNotExists = async (user: UserInfo) => {
       createdAt: new Date(),
     });
   }
+};
+
+const storeTokenToServer = async (token: string) => {
+  await fetch('/api/session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  });
 };
 
 export const registerUser = async (
@@ -54,7 +61,7 @@ export const registerUser = async (
   await createUserDocIfNotExists(userData);
 
   const token = await user.getIdToken();
-  Cookies.set('token', token, { expires: 1 });
+  await storeTokenToServer(token);
 
   return userCredential;
 };
@@ -84,7 +91,7 @@ export const loginUser = async (email: string, password: string) => {
   }
 
   const token = await user.getIdToken();
-  Cookies.set('token', token, { expires: 1 });
+  await storeTokenToServer(token);
 
   return userCredential;
 };
@@ -105,7 +112,7 @@ export const loginWithGoogle = async () => {
   await createUserDocIfNotExists(userData);
 
   const token = await user.getIdToken();
-  Cookies.set('token', token, { expires: 1 });
+  await storeTokenToServer(token);
 
   return userCredential;
 };
@@ -113,7 +120,8 @@ export const loginWithGoogle = async () => {
 export const logoutUser = async () => {
   await signOut(auth);
   useUserStore.getState().logout();
-  Cookies.remove('token'); // 🔐 Hapus token
+
+  await fetch('/api/seeion', { method: 'POST' });
 };
 
 export const getLoginProvider = async (): Promise<
