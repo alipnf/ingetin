@@ -1,23 +1,11 @@
-import { cookies } from 'next/headers';
-import { adminAuth } from '@/lib/firebase/config-admin';
-import { redirect } from 'next/navigation';
+import { requireUser } from '@/lib/require-user';
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
+  await requireUser();
 
-  if (!token) {
-    redirect('/login');
-  }
-
-  try {
-    await adminAuth.verifyIdToken(token);
-  } catch {
-    redirect('/login');
-  }
   return <>{children}</>;
 }
