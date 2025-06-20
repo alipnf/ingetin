@@ -115,3 +115,18 @@ export const logoutUser = async () => {
   useUserStore.getState().logout();
   Cookies.remove('token'); // 🔐 Hapus token
 };
+
+export const getLoginProvider = async (): Promise<
+  'google' | 'email' | 'unknown'
+> => {
+  const user = auth.currentUser;
+
+  if (!user) return 'unknown';
+
+  const providers = user.providerData.map((p) => p.providerId);
+
+  if (providers.includes('google.com')) return 'google';
+  if (providers.includes('password')) return 'email';
+
+  return 'unknown';
+};
