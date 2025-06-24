@@ -1,36 +1,196 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📝 Ingetin - Task Management App
 
-## Getting Started
+Ingetin adalah aplikasi manajemen tugas yang dibangun dengan Next.js 15,
+Firebase, dan integrasi Google Calendar. Aplikasi ini memungkinkan pengguna
+untuk mengelola tugas-tugas mereka dengan mudah dan efisien.
 
-First, run the development server:
+## ✨ Fitur Utama
+
+### 🔐 Autentikasi
+
+- **Login/Register**: Sistem autentikasi yang aman menggunakan Firebase Auth
+- **Google OAuth**: Login cepat menggunakan akun Google
+- **Session Management**: Manajemen sesi yang aman dengan middleware
+
+### 📋 Manajemen Tugas
+
+- **Tambah Tugas**: Buat tugas baru dengan judul, deskripsi, dan deadline
+- **Edit Tugas**: Ubah detail tugas yang sudah ada
+- **Hapus Tugas**: Hapus tugas yang tidak diperlukan
+- **Status Tugas**: Kelola status tugas (pending, in progress, completed)
+- **Deadline Tracking**: Pantau deadline tugas dengan sistem reminder
+
+### 📅 Integrasi Google Calendar
+
+- **Sinkronisasi Otomatis**: Tugas otomatis ditambahkan ke Google Calendar
+- **Reminder**: Notifikasi email dan popup untuk deadline tugas
+- **Update Real-time**: Perubahan tugas akan tersinkronisasi dengan calendar
+
+### 🎨 Tampilan Fleksibel
+
+- **List View**: Tampilan daftar tugas yang detail dan mudah dibaca
+- **Kanban View**: _(Sedang dalam pengembangan)_
+- **Dark/Light Mode**: Tema yang dapat disesuaikan
+- **Responsive Design**: Optimal di desktop dan mobile
+
+## 🛠️ Teknologi yang Digunakan
+
+### Frontend
+
+- **Next.js 15**: Framework React dengan App Router
+- **React 19**: Library UI terbaru
+- **TypeScript**: Type-safe development
+- **Tailwind CSS 4**: Utility-first CSS framework
+- **Radix UI**: Komponen UI yang accessible
+- **Lucide React**: Icon library modern
+
+### Backend & Database
+
+- **Firebase**: Backend-as-a-Service
+  - Authentication
+  - Firestore Database
+  - Security Rules
+- **Google APIs**: Integrasi Calendar dan OAuth
+
+### State Management & Utils
+
+- **Zustand**: State management yang ringan
+- **Next Themes**: Theme management
+- **Sonner**: Toast notifications
+- **Cookies Next**: Cookie management
+
+## 🚀 Instalasi dan Setup
+
+### Prasyarat
+
+- Node.js (versi 18 atau lebih baru)
+- PNPM package manager
+- Akun Firebase
+- Google Cloud Console account (untuk Calendar integration)
+
+### 1. Clone Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd ingetin
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Setup Environment Variables
 
-## Learn More
+Buat file `.env.local` di root project:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+# Firebase Config
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Firebase Admin (Server-side)
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_CLIENT_EMAIL=your_client_email
+FIREBASE_PRIVATE_KEY=your_private_key
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
 
-## Deploy on Vercel
+### 4. Setup Firebase
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Buat project baru di [Firebase Console](https://console.firebase.google.com/)
+2. Enable Authentication dengan Google provider
+3. Buat Firestore database
+4. Setup Security Rules untuk Firestore
+5. Download service account key untuk admin SDK
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 5. Setup Google Calendar API
+
+1. Buka [Google Cloud Console](https://console.cloud.google.com/)
+2. Enable Google Calendar API
+3. Buat OAuth 2.0 credentials
+4. Tambahkan authorized redirect URIs
+
+### 6. Jalankan Development Server
+
+```bash
+pnpm dev
+```
+
+Buka [http://localhost:3000](http://localhost:3000) di browser.
+
+## 📁 Struktur Project
+
+```
+ingetin/
+├── app/                    # Next.js App Router
+│   ├── (auth)/            # Authentication pages
+│   ├── (main)/            # Main app pages
+│   └── api/               # API routes
+├── components/            # Reusable components
+│   ├── dashboard/         # Dashboard-specific components
+│   └── ui/                # Base UI components
+├── hooks/                 # Custom React hooks
+├── lib/                   # Utility libraries
+│   ├── firebase/          # Firebase configuration
+│   └── calendar-integration.ts
+├── store/                 # Zustand stores
+├── types/                 # TypeScript type definitions
+└── style/                 # Global styles
+```
+
+## 🎯 Scripts
+
+```bash
+# Development
+pnpm dev          # Jalankan development server dengan Turbopack
+
+# Production
+pnpm build        # Build aplikasi untuk production
+pnpm start        # Jalankan production server
+
+# Code Quality
+pnpm lint         # Jalankan ESLint
+```
+
+## 🔧 Konfigurasi
+
+### Firestore Security Rules
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/tasks/{taskId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+
+### Middleware Configuration
+
+Aplikasi menggunakan middleware untuk proteksi route yang memerlukan
+autentikasi.
+
+## 🤝 Kontribusi
+
+1. Fork repository ini
+2. Buat branch feature (`git checkout -b feature/amazing-feature`)
+3. Commit perubahan (`git commit -m 'Add amazing feature'`)
+4. Push ke branch (`git push origin feature/amazing-feature`)
+5. Buat Pull Request
+
+## 📄 Lisensi
+
+Project ini menggunakan lisensi MIT. Lihat file `LICENSE` untuk detail lebih
+lanjut.
