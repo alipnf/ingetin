@@ -31,6 +31,7 @@ export function TaskCard({
   link,
   status,
   googleCalendar,
+  googleCalendarEventId,
   onStatusChange = () => {},
   onEdit,
   onDelete,
@@ -118,11 +119,15 @@ export function TaskCard({
       <CardFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between">
         <AddTask
           mode="edit"
-          task={{ id, title, description, deadline, link, status, googleCalendar }}
+          task={{ id, title, description, deadline, link, status, googleCalendar, googleCalendarEventId }}
           onSave={onEdit}
         />
         <DeleteTask 
           taskId={id}
+          taskData={{
+            googleCalendar: googleCalendar || false,
+            googleCalendarEventId: googleCalendarEventId,
+          }}
           onDelete={onDelete} 
         />
       </CardFooter>

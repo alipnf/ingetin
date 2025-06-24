@@ -14,14 +14,19 @@ import { Trash } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { deleteTask } from '@/lib/firebase/task';
+import { deleteTaskWithCalendar } from '@/lib/calendar-integration';
 import { useUserStore } from '@/store/user-store';
 
 type DeleteTaskProps = {
   taskId?: string;
+  taskData?: {
+    googleCalendar: boolean;
+    googleCalendarEventId?: string;
+  };
   onDelete?: () => void;
 };
 
-export function DeleteTask({ taskId, onDelete = () => {} }: DeleteTaskProps) {
+export function DeleteTask({ taskId, taskData, onDelete = () => {} }: DeleteTaskProps) {
   const [loading, setLoading] = useState(false);
   const { user } = useUserStore();
 
@@ -39,8 +44,21 @@ export function DeleteTask({ taskId, onDelete = () => {} }: DeleteTaskProps) {
     setLoading(true);
 
     try {
-      await deleteTask(user.uid, taskId);
-      toast.success('Tugas berhasil dihapus');
+      // Use calendar integration if task data is provided
+      if (taskData) {
+        await deleteTaskWithCalendar(user.uid, taskId, taskData);
+        
+        if (taskData.googleCalendar && taskData.googleCalendarEventId) {
+          toast.success('Tugas dan event calendar berhasil dihapus 📅');
+        } else {
+          toast.success('Tugas berhasil dihapus');
+        }
+      } else {
+        // Fallback to regular delete
+        await deleteTask(user.uid, taskId);
+        toast.success('Tugas berhasil dihapus');
+      }
+      
       onDelete();
     } catch (error) {
       console.error('Error deleting task:', error);

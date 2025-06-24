@@ -22,6 +22,7 @@ export type Task = {
   link: string;
   status: 'belum' | 'proses' | 'selesai';
   googleCalendar: boolean;
+  googleCalendarEventId?: string;
   createdAt: Timestamp;
 };
 
@@ -179,16 +180,19 @@ export const convertTaskCardToInput = (taskCard: TaskCardProps): TaskInput => {
     link: taskCard.link || '',
     status: (taskCard.status as 'belum' | 'proses' | 'selesai') || 'belum',
     googleCalendar: taskCard.googleCalendar || false,
+    googleCalendarEventId: taskCard.googleCalendarEventId,
   };
 };
 
 export const convertTaskToTaskCard = (task: Task): TaskCardProps => {
   return {
+    id: task.id,
     title: task.title,
     description: task.description,
     deadline: task.deadline,
     link: task.link,
     status: task.status,
     googleCalendar: task.googleCalendar,
+    googleCalendarEventId: task.googleCalendarEventId, // ✨ Add this
   };
 };

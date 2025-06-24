@@ -17,7 +17,8 @@ import {
 import { Label } from '@/components/ui/label';
 import FormField from '../form-field';
 import { getLoginProvider } from '@/lib/firebase/auth';
-import { createTask, updateTask, convertTaskCardToInput } from '@/lib/firebase/task';
+import { updateTask, convertTaskCardToInput } from '@/lib/firebase/task';
+import { createTaskWithCalendar } from '@/lib/calendar-integration';
 import { useUserStore } from '@/store/user-store';
 
 type AddTaskProps = {
@@ -61,7 +62,7 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user?.uid) {
       toast.error('Anda harus login untuk menambah tugas');
       return;
@@ -83,8 +84,15 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
       const taskInput = convertTaskCardToInput(formData);
 
       if (mode === 'add') {
-        await createTask(user.uid, taskInput);
-        toast.success('Tugas berhasil ditambahkan');
+        const result = await createTaskWithCalendar(user.uid, taskInput);
+
+        if (result.calendarEventId) {
+          toast.success('Tugas berhasil ditambahkan ke Google Calendar! 📅');
+        } else if (taskInput.googleCalendar) {
+          toast.success('Tugas berhasil ditambahkan (tanpa calendar)');
+        } else {
+          toast.success('Tugas berhasil ditambahkan');
+        }
       } else if (mode === 'edit' && task?.id) {
         await updateTask(user.uid, task.id, taskInput);
         toast.success('Tugas berhasil diperbarui');
@@ -96,7 +104,7 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
       }
 
       setOpen(false);
-      
+
       // Reset form for add mode
       if (mode === 'add') {
         setFormData({
@@ -110,7 +118,9 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
       }
     } catch (error) {
       console.error('Error saving task:', error);
-      toast.error(mode === 'add' ? 'Gagal menambahkan tugas' : 'Gagal memperbarui tugas');
+      toast.error(
+        mode === 'add' ? 'Gagal menambahkan tugas' : 'Gagal memperbarui tugas'
+      );
     } finally {
       setLoading(false);
     }
@@ -218,7 +228,7 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
               Batal
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Menyimpan...' : (mode === 'add' ? 'Tambah' : 'Simpan')}
+              {loading ? 'Menyimpan...' : mode === 'add' ? 'Tambah' : 'Simpan'}
             </Button>
           </DialogFooter>
         </form>

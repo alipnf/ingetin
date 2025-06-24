@@ -98,8 +98,18 @@ export const loginUser = async (email: string, password: string) => {
 
 export const loginWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
+
+  provider.addScope('https://www.googleapis.com/auth/calendar');
+
   const userCredential = await signInWithPopup(auth, provider);
   const { user } = userCredential;
+
+  const credential = GoogleAuthProvider.credentialFromResult(userCredential);
+  const accessToken = credential?.accessToken;
+
+  if (accessToken) {
+    localStorage.setItem('google_access_token', accessToken);
+  }
 
   const userData: UserInfo = {
     uid: user.uid,
@@ -122,12 +132,17 @@ export const logoutUser = async () => {
     await signOut(auth);
     useUserStore.getState().logout();
 
+    localStorage.removeItem('google_access_token');
+
     await fetch('/api/session', { method: 'DELETE' });
 
     window.location.href = '/login';
   } catch (error) {
     console.error('Error during logout:', error);
     useUserStore.getState().logout();
+
+    localStorage.removeItem('google_access_token');
+
     window.location.href = '/login';
   }
 };
