@@ -14,6 +14,7 @@ type UserInfo = {
   name: string | null;
   email: string | null;
   photoURL: string | null;
+  provider?: 'google' | 'email' | 'unknown';
 };
 
 const createUserDocIfNotExists = async (user: UserInfo) => {
@@ -55,6 +56,7 @@ export const registerUser = async (
     name: username,
     email: user.email,
     photoURL: user.photoURL,
+    provider: 'email',
   };
 
   useUserStore.getState().setUser(userData);
@@ -84,6 +86,7 @@ export const loginUser = async (email: string, password: string) => {
       name: userData.displayName || userData.name,
       email: user.email,
       photoURL: user.photoURL,
+      provider: 'email',
     };
 
     useUserStore.getState().setUser(userDataStore);

@@ -20,6 +20,8 @@ import { getLoginProvider } from '@/lib/firebase/auth';
 import { updateTask, convertTaskCardToInput } from '@/lib/firebase/task';
 import { createTaskWithCalendar } from '@/lib/calendar-integration';
 import { useUserStore } from '@/store/user-store';
+import { auth } from '@/lib/firebase/config-client';
+import { onAuthStateChanged } from 'firebase/auth';
 
 type AddTaskProps = {
   task?: TaskCardProps & { id?: string };
@@ -41,18 +43,59 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
   const [loginProvider, setLoginProvider] = useState<
     'google' | 'email' | 'unknown'
   >('unknown');
+  const [providerLoading, setProviderLoading] = useState(true);
 
-  const { user } = useUserStore();
-  const isGoogleLogin = loginProvider === 'google';
+  const { user, setProvider } = useUserStore();
+  const storedProvider = user?.provider;
+  const currentProvider = storedProvider || loginProvider;
+  const isGoogleLogin = currentProvider === 'google';
+  const hasGoogleAccess = isGoogleLogin && localStorage.getItem('google_access_token');
 
   useEffect(() => {
     const checkProvider = async () => {
-      const provider = await getLoginProvider();
-      setLoginProvider(provider);
+      try {
+        // If provider is already stored, use it and skip loading
+        if (storedProvider && storedProvider !== 'unknown') {
+          setLoginProvider(storedProvider);
+          setProviderLoading(false);
+          return;
+        }
+
+        setProviderLoading(true);
+        
+        // Wait for auth state to be ready
+        const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+          if (authUser) {
+            const provider = await getLoginProvider();
+            setLoginProvider(provider);
+            setProvider(provider); // Store in user store
+          } else {
+            setLoginProvider('unknown');
+            setProvider('unknown');
+          }
+          setProviderLoading(false);
+          unsubscribe(); // Cleanup listener after first check
+        });
+
+        // Fallback timeout in case auth state doesn't change
+        const timeout = setTimeout(() => {
+          setProviderLoading(false);
+          unsubscribe();
+        }, 3000);
+
+        return () => {
+          clearTimeout(timeout);
+          unsubscribe();
+        };
+      } catch (error) {
+        console.error('Error checking login provider:', error);
+        setProviderLoading(false);
+        setLoginProvider('unknown');
+      }
     };
 
     checkProvider();
-  }, []);
+  }, [user, storedProvider, setProvider]);
 
   useEffect(() => {
     if (task && mode === 'edit') {
@@ -197,25 +240,38 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
                 <Switch
                   id="google-calendar"
                   checked={formData.googleCalendar}
-                  disabled={!isGoogleLogin}
+                  disabled={providerLoading || !hasGoogleAccess}
                   onCheckedChange={(checked) =>
                     handleInputChange('googleCalendar', checked)
                   }
                 />
                 <Label htmlFor="google-calendar">
                   Tambahkan ke Google Calendar
+                  {providerLoading && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      (Loading...)
+                    </span>
+                  )}
                 </Label>
               </div>
 
-              {!isGoogleLogin && (
+              {!providerLoading && !isGoogleLogin && (
                 <p className="text-xs text-red-500">
                   Login dengan Google untuk menggunakan fitur ini
                 </p>
               )}
 
-              <p className="text-sm text-muted-foreground">
-                Tugas akan otomatis ditambahkan ke Google Calendar Anda
-              </p>
+              {!providerLoading && isGoogleLogin && !localStorage.getItem('google_access_token') && (
+                <p className="text-xs text-yellow-600">
+                  Akses Google Calendar tidak tersedia. Silakan login ulang.
+                </p>
+              )}
+
+              {!providerLoading && hasGoogleAccess && (
+                <p className="text-sm text-muted-foreground">
+                  Tugas akan otomatis ditambahkan ke Google Calendar Anda
+                </p>
+              )}
             </div>
           </DialogHeader>
           <DialogFooter className="mt-4">
