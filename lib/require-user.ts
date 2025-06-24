@@ -13,6 +13,7 @@ export async function requireUser() {
     const decoded = await adminAuth.verifyIdToken(token);
     return decoded;
   } catch (error) {
+    console.error('Token verification failed:', error);
     // If token is invalid/expired, delete it
     cookieStore.set('token', '', {
       httpOnly: true,
