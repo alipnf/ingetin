@@ -118,10 +118,18 @@ export const loginWithGoogle = async () => {
 };
 
 export const logoutUser = async () => {
-  await signOut(auth);
-  useUserStore.getState().logout();
+  try {
+    await signOut(auth);
+    useUserStore.getState().logout();
 
-  await fetch('/api/seeion', { method: 'POST' });
+    await fetch('/api/session', { method: 'DELETE' });
+
+    window.location.href = '/login';
+  } catch (error) {
+    console.error('Error during logout:', error);
+    useUserStore.getState().logout();
+    window.location.href = '/login';
+  }
 };
 
 export const getLoginProvider = async (): Promise<

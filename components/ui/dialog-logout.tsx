@@ -10,10 +10,26 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { LogOut } from 'lucide-react';
+import { useState } from 'react';
 
 export function DialogLogout({ handleLogout }: { handleLogout: () => void }) {
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const onLogout = async () => {
+    setLoading(true);
+    try {
+      await handleLogout();
+      setOpen(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-full" variant="ghost">
           <LogOut className="mr-2 h-4 w-4" />
@@ -29,10 +45,12 @@ export function DialogLogout({ handleLogout }: { handleLogout: () => void }) {
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Batal</Button>
+            <Button variant="outline" disabled={loading}>
+              Batal
+            </Button>
           </DialogClose>
-          <Button onClick={handleLogout} variant="destructive">
-            Keluar
+          <Button onClick={onLogout} variant="destructive" disabled={loading}>
+            {loading ? 'Memproses...' : 'Keluar'}
           </Button>
         </DialogFooter>
       </DialogContent>
