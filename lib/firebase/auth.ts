@@ -59,11 +59,7 @@ export const registerUser = async (
     provider: 'email',
   };
 
-  useUserStore.getState().setUser(userData);
   await createUserDocIfNotExists(userData);
-
-  const token = await user.getIdToken();
-  await storeTokenToServer(token);
 
   return userCredential;
 };
@@ -119,6 +115,7 @@ export const loginWithGoogle = async () => {
     name: user.displayName,
     email: user.email,
     photoURL: user.photoURL,
+    provider: 'google',
   };
 
   useUserStore.getState().setUser(userData);
