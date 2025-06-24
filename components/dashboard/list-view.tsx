@@ -1,11 +1,31 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { dummyTasks } from '@/data/dummy/tasks';
-import { useState } from 'react';
-import { TaskCardProps } from '@/types/task-card';
 import { TaskCard } from './task-card';
+import { useTasks } from '@/hooks/use-tasks';
+import { convertTaskToTaskCard } from '@/lib/firebase/task';
+import { TaskLoadingGrid } from './task-loading-skeleton';
 
 export function ListView() {
-  const [tasks, setTasks] = useState<TaskCardProps[]>(dummyTasks);
+  const { tasks, loading, error } = useTasks();
+
+  if (loading) {
+    return <TaskLoadingGrid count={6} />;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (tasks.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">Belum ada tugas. Tambahkan tugas pertama Anda!</p>
+      </div>
+    );
+  }
 
   const tabs = [
     { label: 'Semua', value: 'semua' },
@@ -13,30 +33,6 @@ export function ListView() {
     { label: 'Sedang dikerjakan', value: 'proses' },
     { label: 'Selesai', value: 'selesai' },
   ];
-
-  const handleStatusChange = (taskIndex: number, value: string) => {
-    setTasks((prevTasks) => {
-      const newTasks = [...prevTasks];
-      newTasks[taskIndex] = { ...newTasks[taskIndex], status: value };
-      return newTasks;
-    });
-  };
-
-  const handleEditTask = (taskIndex: number, updatedTask: TaskCardProps) => {
-    setTasks((prevTasks) => {
-      const newTasks = [...prevTasks];
-      newTasks[taskIndex] = updatedTask;
-      return newTasks;
-    });
-  };
-
-  const handleDeleteTask = (taskIndex: number) => {
-    setTasks((prevTasks) => {
-      const newTasks = [...prevTasks];
-      newTasks.splice(taskIndex, 1);
-      return newTasks;
-    });
-  };
 
   return (
     <Tabs defaultValue="semua" className="w-full">
@@ -58,13 +54,11 @@ export function ListView() {
               .filter(
                 (task) => tab.value === 'semua' || task.status === tab.value
               )
-              .map((task, index) => (
+              .map((task) => (
                 <TaskCard
-                  key={index}
-                  {...task}
-                  onStatusChange={(value) => handleStatusChange(index, value)}
-                  onEdit={(updatedTask) => handleEditTask(index, updatedTask)}
-                  onDelete={() => handleDeleteTask(index)}
+                  key={task.id}
+                  id={task.id}
+                  {...convertTaskToTaskCard(task)}
                 />
               ))}
           </div>

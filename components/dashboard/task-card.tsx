@@ -15,8 +15,16 @@ import {
 } from '@/components/ui/select';
 import { TaskCardProps } from '@/types/task-card';
 import { DeleteTask, AddTask } from './index';
+import { updateTask } from '@/lib/firebase/task';
+import { useUserStore } from '@/store/user-store';
+import { toast } from 'sonner';
+
+export interface TaskCardPropsWithId extends TaskCardProps {
+  id: string;
+}
 
 export function TaskCard({
+  id,
   title,
   description,
   deadline,
@@ -26,7 +34,33 @@ export function TaskCard({
   onStatusChange = () => {},
   onEdit,
   onDelete,
-}: TaskCardProps) {
+}: TaskCardPropsWithId) {
+  const { user } = useUserStore();
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (!user?.uid) {
+      toast.error('Anda harus login untuk mengubah status');
+      return;
+    }
+
+    if (newStatus === 'semua') return;
+
+    try {
+      await updateTask(user.uid, id, { 
+        status: newStatus as 'belum' | 'proses' | 'selesai' 
+      });
+      toast.success('Status tugas berhasil diperbarui');
+      
+      // Call the callback if provided
+      if (onStatusChange) {
+        onStatusChange(newStatus);
+      }
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      toast.error('Gagal memperbarui status tugas');
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="space-y-2">
@@ -68,12 +102,11 @@ export function TaskCard({
         {/* Status Select */}
         <div className="flex flex-col gap-1.5">
           <span className="font-medium">Status:</span>
-          <Select defaultValue={status} onValueChange={onStatusChange}>
+          <Select defaultValue={status} onValueChange={handleStatusChange}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent position="popper">
-              <SelectItem value="semua">Semua</SelectItem>
               <SelectItem value="belum">Belum dikerjakan</SelectItem>
               <SelectItem value="proses">Sedang dikerjakan</SelectItem>
               <SelectItem value="selesai">Selesai</SelectItem>
@@ -85,10 +118,13 @@ export function TaskCard({
       <CardFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between">
         <AddTask
           mode="edit"
-          task={{ title, description, deadline, link, status, googleCalendar }}
+          task={{ id, title, description, deadline, link, status, googleCalendar }}
           onSave={onEdit}
         />
-        <DeleteTask onDelete={onDelete} />
+        <DeleteTask 
+          taskId={id}
+          onDelete={onDelete} 
+        />
       </CardFooter>
     </Card>
   );

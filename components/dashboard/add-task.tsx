@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Edit } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { TaskCardProps } from '@/types/task-card';
+import { toast } from 'sonner';
 
 import {
   Dialog,
@@ -16,15 +17,18 @@ import {
 import { Label } from '@/components/ui/label';
 import FormField from '../form-field';
 import { getLoginProvider } from '@/lib/firebase/auth';
+import { createTask, updateTask, convertTaskCardToInput } from '@/lib/firebase/task';
+import { useUserStore } from '@/store/user-store';
 
 type AddTaskProps = {
-  task?: TaskCardProps;
+  task?: TaskCardProps & { id?: string };
   onSave?: (task: TaskCardProps) => void;
   mode?: 'add' | 'edit';
 };
 
 export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<TaskCardProps>({
     title: '',
     description: '',
@@ -37,6 +41,7 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
     'google' | 'email' | 'unknown'
   >('unknown');
 
+  const { user } = useUserStore();
   const isGoogleLogin = loginProvider === 'google';
 
   useEffect(() => {
@@ -54,12 +59,61 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
     }
   }, [task, mode]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSave) {
-      onSave(formData);
+    
+    if (!user?.uid) {
+      toast.error('Anda harus login untuk menambah tugas');
+      return;
     }
-    setOpen(false);
+
+    if (!formData.title?.trim()) {
+      toast.error('Judul tugas harus diisi');
+      return;
+    }
+
+    if (!formData.deadline) {
+      toast.error('Deadline harus diisi');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const taskInput = convertTaskCardToInput(formData);
+
+      if (mode === 'add') {
+        await createTask(user.uid, taskInput);
+        toast.success('Tugas berhasil ditambahkan');
+      } else if (mode === 'edit' && task?.id) {
+        await updateTask(user.uid, task.id, taskInput);
+        toast.success('Tugas berhasil diperbarui');
+      }
+
+      // Call the callback if provided (for parent component updates)
+      if (onSave) {
+        onSave(formData);
+      }
+
+      setOpen(false);
+      
+      // Reset form for add mode
+      if (mode === 'add') {
+        setFormData({
+          title: '',
+          description: '',
+          deadline: '',
+          link: '',
+          status: 'belum',
+          googleCalendar: false,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving task:', error);
+      toast.error(mode === 'add' ? 'Gagal menambahkan tugas' : 'Gagal memperbarui tugas');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInputChange = (id: string, value: string | boolean) => {
@@ -159,11 +213,12 @@ export function AddTask({ task, onSave, mode = 'add' }: AddTaskProps) {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
+              disabled={loading}
             >
               Batal
             </Button>
-            <Button type="submit">
-              {mode === 'add' ? 'Tambah' : 'Simpan'}
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Menyimpan...' : (mode === 'add' ? 'Tambah' : 'Simpan')}
             </Button>
           </DialogFooter>
         </form>
